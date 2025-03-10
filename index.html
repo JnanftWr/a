@@ -5,77 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>贪吃蛇游戏</title>
     <style>
-      body {
-        text-align: center;
-        margin: 0;
-        font-family: Arial, sans-serif;
-      }
       canvas {
         border: 2px solid black;
         display: block;
-        margin: 20px auto;
+        margin: 0 auto;
         background-color: #f0f0f0;
       }
       .controls {
-        margin: 20px auto;
-        display: grid;
-        grid-template-columns: auto auto auto;
-        grid-template-rows: auto auto auto;
-        gap: 10px;
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
       }
-      .controls button {
-        background: none;
-        border: none;
-        font-size: 24px;
+      .control-button {
+        width: 50px;
+        height: 50px;
+        border: 1px solid #ccc;
+        margin: 5px;
         cursor: pointer;
-        outline: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #e0e0e0;
+        border-radius: 5px;
       }
-      .controls button:hover {
-        color: #666;
-      }
-      .controls .up,
-      .controls .down,
-      .controls .left,
-      .controls .right {
-        position: relative;
-      }
-      .controls .up::before {
-        content: "⇧";
-        position: absolute;
-        top: -30px;
-      }
-      .controls .down::before {
-        content: "⇩";
-        position: absolute;
-        top: 30px;
-      }
-      .controls .left::before {
-        content: "⇦";
-        position: absolute;
-        left: -30px;
-      }
-      .controls .right::before {
-        content: "⇨";
-        position: absolute;
-        right: -30px;
+      .control-button svg {
+        width: 30px;
+        height: 30px;
       }
     </style>
   </head>
   <body>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <div class="controls">
-      <button class="up"></button>
-      <button class="left"></button>
-      <button class="right"></button>
-      <button class="down"></button>
+      <button id="up" class="control-button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M12 8l-6 6h12l-6-6z" />
+        </svg>
+      </button>
+      <button id="down" class="control-button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M12 16l6-6h-12l6 6z" />
+        </svg>
+      </button>
+      <button id="left" class="control-button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M16 12l-6-6v12l6-6z" />
+        </svg>
+      </button>
+      <button id="right" class="control-button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M8 12l6 6v-12l-6 6z" />
+        </svg>
+      </button>
     </div>
     <script>
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
-      const upButton = document.querySelector(".up");
-      const downButton = document.querySelector(".down");
-      const leftButton = document.querySelector(".left");
-      const rightButton = document.querySelector(".right");
 
       // 游戏参数
       const box = 20; // 单个方块的大小
@@ -85,6 +70,10 @@
         x: Math.floor(Math.random() * 20) * box,
         y: Math.floor(Math.random() * 20) * box,
       }; // 食物初始位置
+      let poison = {
+        x: Math.floor(Math.random() * 20) * box,
+        y: Math.floor(Math.random() * 20) * box,
+      }; // 毒果初始位置
 
       // 监听键盘事件
       document.addEventListener("keydown", (event) => {
@@ -100,16 +89,19 @@
       });
 
       // 监听按钮事件
-      upButton.addEventListener("click", () => {
+      document.getElementById("up").addEventListener("click", () => {
         if (direction !== "DOWN") direction = "UP";
       });
-      downButton.addEventListener("click", () => {
+
+      document.getElementById("down").addEventListener("click", () => {
         if (direction !== "UP") direction = "DOWN";
       });
-      leftButton.addEventListener("click", () => {
+
+      document.getElementById("left").addEventListener("click", () => {
         if (direction !== "RIGHT") direction = "LEFT";
       });
-      rightButton.addEventListener("click", () => {
+
+      document.getElementById("right").addEventListener("click", () => {
         if (direction !== "LEFT") direction = "RIGHT";
       });
 
@@ -120,6 +112,10 @@
         // 绘制食物
         ctx.fillStyle = "green";
         ctx.fillRect(food.x, food.y, box, box);
+
+        // 绘制毒果
+        ctx.fillStyle = "red";
+        ctx.fillRect(poison.x, poison.y, box, box);
 
         // 绘制贪吃蛇
         for (let i = 0; i < snake.length; i++) {
@@ -146,6 +142,17 @@
           };
         } else {
           snake.pop(); // 移除蛇的尾部
+        }
+
+        // 判断是否吃到毒果
+        if (snakeX === poison.x && snakeY === poison.y) {
+          poison = {
+            x: Math.floor(Math.random() * 20) * box,
+            y: Math.floor(Math.random() * 20) * box,
+          };
+          if (snake.length > 1) {
+            snake.pop(); // 移除蛇的尾部
+          }
         }
 
         // 添加新的头部
