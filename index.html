@@ -145,15 +145,6 @@
         }
 
         // 判断是否吃到毒果
-        if (snakeX === poison.x && snakeY === poison.y) {
-          poison = {
-            x: Math.floor(Math.random() * 20) * box,
-            y: Math.floor(Math.random() * 20) * box,
-          };
-          if (snake.length > 1) {
-            snake.pop(); // 移除蛇的尾部
-          }
-        }
 
         // 添加新的头部
         let newHead = { x: snakeX, y: snakeY };
